@@ -1,2 +1,8 @@
 # Apuntes-Curso-Angular
-- En este documento crearé inforamción acerca del curso de angular de F.Herrera
+---
+
+## 01_Bases
+- **Instalación de Angular** `npm install -g @angular/cli` instalará angular CLI en modo global.
+- [Documentación](https://angular.io/cli) relativa a angular/cli
+
+ 
