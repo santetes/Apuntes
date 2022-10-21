@@ -149,6 +149,9 @@ constructor(private http: HttpClient) {}
 - Ahora ya podemos hacer uso del objeto http el cual nos proporciona todo lo necesario para trabajar con el protocolo HTTP
 - Existen muchas ventajas para trabajar en base a http Angular, entre otras, el uso de los Observables 
 - Ejemplo petición http.get con **params**
+  - Params nos permite configurar una petición de este tipo: 
+  - https://api.giphy.com/v1/gifs/search?api_key=1TpDBYvXGJfoUHuwM20R3wKIOR0cgtEb&q=car&limit=10
+  - Observese en esta petición los parámetros "api_key", "q", "limit" 
 ```javascript
 busquedaApi(terminoBusqueda: string) {
     const params = new HttpParams()
@@ -164,3 +167,40 @@ busquedaApi(terminoBusqueda: string) {
       });
   }
 ```
+
+### Tipado de una respuesta
+- Es conveniente realizar este tipado para poder ir viendo todos las propiedades de un objeto de tipo respuestas
+- La herramienta que se usará para esta función es la página [QuickType](https://quicktype.io/)
+- Tan solo hay que copiar la respuesta de una petición en esa página y automáticamente tendremos la configuración de una interface con el tipado
+
+### Persistencia de Información - LocalStorage
+- Es un método que tenemos para almacenar información en nuestro navegador y hacerla persistente
+```javascript
+localStorage.setItem('clave', JSON.stringify(this._infoLocalStorage);
+```
+- Recuperar información del localStorage
+```javascript
+this._infoLocalStorage = JSON.parse(localStorage.getItem('arrayBusquedas') || '[]');
+```
+- Observese el uso del objeto global `JSON` para convertir un objeto en string y un string en objeto (localStorage sólo almacena strings)
+- **Tip**: para manejar la información en el localStorage, array de strings y demás es conveniente manejarla en minúsculas y sin espacios antes y después del string. Para que a la hora de buscar, coincidencias, etc... no nos surja ningún error 
+`this.almacenaEnLocalStorage(terminoBusqueda.trim().toLowerCase());`
+- Luego, si en la vista queremos que aparezcan esos strings bien capitalizados, únicamente tenemos que pasarlos por el pipe `{item | Tittlecase}` Se verá detenidamente los Pipes más adelante
+
+### Animate.css
+- Es una libreria que nos permite mejorar la visualización de los elementos en la vista que aparecen y desaparecen bruscamente.  
+- Para ello utilizaremos la libreria [Animate.css](https://animate.style/)
+- Hay varias formas de insertarla en nuestro proyecto, una de ellas es mediante el CDN en el `index.html`
+```html
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+```
+- Luego, únicamente tenemos que incluir en elemento que queramos realizar la mejora de la visualización la clase:
+- `class="animate__animated animate__fadeIn"`
+- Reivisar la documentación de la página oficial para ver más efectos
+---
+## 03_PaisesApp
+- En esta aplicación estaremos consumiendo la Api [RestCoutries](https://restcountries.com/)
+- También haremos uso de **BootStrap** para realizar la maquetación gráfica
