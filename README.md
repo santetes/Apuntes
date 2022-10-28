@@ -1,19 +1,37 @@
  <!-- title: Apuntes Angular -->
 
-- [Apuntes-Curso-Angular](#apuntes-curso-angular)
-  - [01_Bases](#01_bases)
-    - [Comunicación entre vista y controlador - [(ngModel)] - {{atributo}}](#comunicación-entre-vista-y-controlador---ngmodel---atributo)
-    - [Comunicación entre componente padre e hijo - @Input()](#comunicación-entre-componente-padre-e-hijo---input)
-    - [Comunicación entre componente hijo y padre - @Output - EventEmitter](#comunicación-entre-componente-hijo-y-padre---output---eventemitter)
-    - [Servicios](#servicios)
-  - [02_Gifs App](#02_gifs-app)
-    - [@ViewChild (aplicado a elementos del DOM)](#viewchild-aplicado-a-elementos-del-dom)
-    - [Comunicación con una API - Angular HTTP](#comunicación-con-una-api---angular-http)
-    - [Tipado de una respuesta](#tipado-de-una-respuesta)
-    - [Persistencia de Información - LocalStorage](#persistencia-de-información---localstorage)
-    - [Animate.css](#animatecss)
-  - [03_PaisesApp](#03_paisesapp)
-    - [Rutas](#rutas)
+-   [Apuntes-Curso-Angular](#apuntes-curso-angular)
+    -   [01_Bases](#01_bases)
+        -   [Comunicación entre vista y controlador - [(ngModel)] - {{atributo}}](#comunicación-entre-vista-y-controlador---ngmodel---atributo)
+        -   [Comunicación entre componente padre e hijo - @Input()](#comunicación-entre-componente-padre-e-hijo---input)
+        -   [Comunicación entre componente hijo y padre - @Output - EventEmitter](#comunicación-entre-componente-hijo-y-padre---output---eventemitter)
+        -   [Servicios](#servicios)
+    -   [02_Gifs App](#02_gifs-app)
+        -   [@ViewChild (aplicado a elementos del DOM)](#viewchild-aplicado-a-elementos-del-dom)
+        -   [Comunicación con una API - Angular HTTP](#comunicación-con-una-api---angular-http)
+        -   [Tipado de una respuesta](#tipado-de-una-respuesta)
+        -   [Persistencia de Información - LocalStorage](#persistencia-de-información---localstorage)
+        -   [Animate.css](#animatecss)
+    -   [03_PaisesApp](#03_paisesapp)
+        -   [Rutas Básico. Creación, Implementación](#rutas-básico-creación-implementación)
+        -   [Manejo errores en http](#manejo-errores-en-http)
+        -   [DebounceTime](#debouncetime)
+            -   [Input.Component](#inputcomponent)
+            -   [Input.Html](#inputhtml)
+        -   [Utilización del Input para mostrar resultados sugeridos](#utilización-del-input-para-mostrar-resultados-sugeridos)
+        -   [ngClass, class y [class]](#ngclass-class-y-class)
+    -   [04_PipesApp](#04_pipesapp)
+        -   [PrimeNg](#primeng)
+        -   [PrimeFLex](#primeflex)
+        -   [Pipes Básicos](#pipes-básicos)
+        -   [Cambiar el Locale](#cambiar-el-locale)
+        -   [Pipes Numericos](#pipes-numericos)
+        -   [Pipes no Comunes](#pipes-no-comunes)
+        -   [Pipes Personalizados](#pipes-personalizados)
+    -   [05_HeroesApp](#05_heroesapp)
+        -   [Angular Material](#angular-material)
+        -   [Estructura de nuestra aplicación](#estructura-de-nuestra-aplicación)
+        -   [Rutas - Rutas Hijas, LazyLoad](#rutas---rutas-hijas-lazyload)
 
 # Apuntes-Curso-Angular
 
@@ -280,7 +298,7 @@ this._infoLocalStorage = JSON.parse(
 -   En esta aplicación estaremos consumiendo la Api [RestCoutries](https://restcountries.com/)
 -   También haremos uso de **BootStrap** para realizar la maquetación gráfica
 
-### Rutas
+### Rutas Básico. Creación, Implementación
 
 -   La configuración de las rutas se define dentro del archivo `app-routing.module.ts`
 -   Ejemplo de la configuración del archivo en la aplicación Paises_App
@@ -288,10 +306,7 @@ this._infoLocalStorage = JSON.parse(
 ```typescript
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-import { PorPaisComponent } from './pais/pages/por-pais/por-pais.component'
-import { PorRegionComponent } from './pais/pages/por-region/por-region.component'
-import { PorCapitalComponent } from './pais/pages/por-capital/por-capital.component'
-import { VerPaisComponent } from './pais/pages/ver-pais/ver-pais.component'
+import ...Todos los restantes componentes
 
 const routes: Routes = [
     {
@@ -326,7 +341,7 @@ export class AppRoutingModule {}
 
 -   Este archivo `app-routing.module` tenemos que importarlo dentro de nuestro módulo principal de nuestra aplicación; `app.module.ts`
 -   Luego, para poder ir visualizando cada uno de los componentes (páginas) que se encuentran enrutadas, tendremos que indicar en la vista contenedora de nuestras páginas la etiqueta que habilita esta visualizacion `<router-outlet></router-outlet>`.
-    -   Esta directiva podemos utilizarla porque en el módulo donde se encutra la vista tenemos importado el `app-routing.module` o en su defecto el `RouterModule`
+    -   Esta directiva podemos utilizarla porque en el módulo donde se encuentra la vista tenemos importado el `app-routing.module` o en su defecto el `RouterModule`
 -   En la parte vista que se encarga de seleccionar la vista a visualizar, en el elemento html correspondiente, deberemos indicar el atributo `routerLink="path_donde_navegar"` Este atributo lo podemos utilizar porque tenemos importado en nuestra aplicación el `RouterModule` en el módulo donde pertenezca la vista (si es en el app.module estará incluido en el `app-routing.module`)
 
 ```html
@@ -351,10 +366,551 @@ export class AppRoutingModule {}
 },
 ```
 
--   En esta sección tanmbién se hace uso del retorno de `Observables` en las peticiones del servicio. Será el metodo que llama a este servicio el que tendrá que gestionar el `subscribe`
+-   Para manejar la ruta cuando hay que pasarle el `ruta/:Id` como es el caso del `{Path: pais/:id}` en el `[RouterLink]` del elemento vista que lo enruta, tenemos que indicarle el id de la siguiente manera:
+
+```html
+<a [RouterLink]="['/pais', pais.alphaCode]"></a>
+```
+
+-   En el Componente que se tiene que activar cuando estamos en la ruta `/pais`, tenemos que cazar el `alphaCode` que se envia en la ruta. Para ello lo mas recomendable es subscribirnos a un observable que está pendiente de los cambios en la ruta del navegador mediante `ActivatedRoute`
+
+```typescript
+constructor(
+    private activatedRouted: ActivatedRoute,
+    private paisService: PaisService
+  ) {}
+
+  ngOnInit(): void {
+    this.activatedRouted.params
+      .pipe(
+        switchMap(({ id }) => this.paisService.buscarPaisPorCodigo(id)),
+        tap(console.log)
+      )
+      .subscribe((pais) => (this.pais = pais));
+  }
+```
+
+-   Observese en el código de arriba el uso de operador RXJS `switchMap`. Este operador lo que hace es encadenar Observables. Hace algo con la respuesta de un Observable y devuelve otro Observable.
+-   También tenemos el operador `tap` el cual es un operador que no realiza ningua operación como tal, sino que va a recibir el resultado del observable y lo va a dejar pasar sin más. Podemos aprovechar este comportamiento, por ejemplo para realizar un `console.log()`
+
+### Manejo errores en http
+
+-   En esta sección también se hace uso del retorno de `Observables` en las peticiones del servicio. Será el metodo que llama a este servicio el que tendrá que gestionar el `subscribe`
 
 ```typescript
 return this.http.get(url)
 ```
 
-prueba
+-   Hay varias formas de manejar un error en la petición Http. Por un lado, en la própia petición se puede capturar mediante un `catchError` (RXJS) en un `pipe` de la petición.
+
+```javascript
+return this.http.get(url).pipe(catchError((err) => of([])))
+```
+
+-   ...y Por otro, en el propio `subscribe`,
+
+```javascript
+Observable.subscribe(next:(res)=>{}, error: (err)=>{
+    this.hayError = true
+})
+```
+
+-   De esta forma, podemos enviar de vuelta un objeto/array vacío o cambiar el valor de un atributo booleano para mostrar o no un `Template` de error en la vista
+
+### DebounceTime
+
+-   DebounceTime es un operador `RXJS` que maneja la entrada de información y la salida de esta.
+    -   solo emite la salida cuando ha pasado un tiempo desde la última entrada.
+    -   Si antes de que haya pasado ese tiempo vuelve a recibir una entrada, el contador de tiempo se resetea
+-   El uso práctico en esta aplicación es la utilización en un **Input de búsqueda**. realizará la búsqueda del término mientras se teclea, pero no realizará la petición hasta que haya pasado 300ms desde la pulsación de la última tecla
+-   Más información e información de como implementarlo mediante formularios Reactivos es [este enlace](https://es.stackoverflow.com/questions/201596/como-prolongar-la-ejecuci%C3%B3n-de-un-evento-en-un-input)
+
+#### Input.Component
+
+```typescript
+import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core'
+import { debounceTime, Subject } from 'rxjs'
+
+@Component({
+    selector: 'app-pais-input',
+    templateUrl: './pais-input.component.html',
+    styleUrls: ['./pais-input.component.css'],
+})
+export class PaisInputComponent implements OnInit {
+    termino: string = ''
+    subject: Subject<string> = new Subject()
+
+    @Input() textoPlaceholder: string = ''
+    @Output() onEnter: EventEmitter<string> = new EventEmitter()
+    @Output() onDebouncer: EventEmitter<string> = new EventEmitter()
+
+    ngOnInit() {
+        this.subject.pipe(debounceTime(300)).subscribe((terminoDebouncer) => {
+            this.onDebouncer.emit(terminoDebouncer)
+        })
+    }
+
+    buscar() {
+        this.onEnter.emit(this.termino)
+    }
+
+    teclaPresionada() {
+        this.subject.next(this.termino)
+    }
+}
+```
+
+#### Input.Html
+
+```html
+<form (ngSubmit)="buscar()" autocomplete="off">
+    <input
+        type="text"
+        [placeholder]="textoPlaceholder"
+        name="termino"
+        class="form-control"
+        [(ngModel)]="termino"
+        (input)="teclaPresionada()"
+    />
+</form>
+```
+
+### Utilización del Input para mostrar resultados sugeridos
+
+-   Mediante la emisión del Observable del dobounceTime, gestionamos la visualización de una tabla de posibles resultados de la búsqueda
+-   En el componente Padre, donde se incluye tanto en `<app-Input>` cómo el `<app-sujerencia>` tenemos el siguiente contenido y su control asociado
+-   **Mostrar Sujerencias**
+
+```html
+<app-pais-input
+    textoPlaceholder="Buscar País..."
+    (onEnter)="buscar($event)"
+    (onDebouncer)="sugerencia($event)"
+>
+</app-pais-input>
+```
+
+```typescript
+sugerencia(termino: string) {
+    this.hayError = false;
+    this.paises = [];
+
+    this.paisService.buscarPais(termino).subscribe({
+      next: (paises) => (this.paisesSugeridos = paises.splice(0, 5)),
+      error: (err) => (this.paisesSugeridos = []),
+    });
+
+    if (termino.length == 0) this.paisesSugeridos = [];
+  }
+```
+
+-   **Seleccionar Sujerencia**
+
+```html
+<app-pais-sugerencias
+    [tipo]="'pais'"
+    [paisesSugeridos]="paisesSugeridos"
+    (onSeleccionSugerido)="buscar($event)"
+></app-pais-sugerencias>
+```
+
+```typescript
+buscar(termino: string) {
+    this.termino = termino;
+    this.hayError = false;
+    this.paisService.buscarPais(this.termino).subscribe({
+      next: (paises) => {
+        this.paises = paises;
+        this.termino = '';
+        this.paisesSugeridos = [];
+      },
+      error: (err) => {
+        this.hayError = true;
+        this.paises = [];
+      },
+    });
+  }
+```
+
+### ngClass, class y [class]
+
+-   Estos son tres formas de añadir clases a la vista de nuestro componente
+-   **[class.estilo_Css]**
+    -   `<button [class.btn-primary]="true/false">` cargará la clase btn-primary de acuerdo a una condición `(region === regionActiva)`
+-   **[ngClass]={clase_Css: boolean}**
+    ```html
+    <button [ngClass]={ btn-primary: regionActiva === region,
+    btn-outline-primary:regionActiva!== region } >
+    ```
+    -   Esto anterior se puede hacer de una forma más eficiente utilizando el operador ternario
+-   **[class]**
+
+```html
+<button [class]="validarRegionActiva(region)"></button>
+```
+
+```typescript
+validarRegionActiva(region: string){
+    return region === this.regionActiva ? 'btn btn-primary' : 'btn btn-outline-primary'
+}
+```
+
+## 04_PipesApp
+
+-   La parte de maquetación de esta aplicación se encuntra desarrollada utilizando la libreria [**PrimeNg**](https://www.primefaces.org/primeng/)
+-   Los pipes no modifican el valor del atributo al que se le aplica. Únicamente cambia su aspecto visual en la vista
+
+### PrimeNg
+
+-   Instalamos PrimeNg y PrimeIcons desde la terminal utilizando node
+
+```
+npm install primeng --save
+npm install primeicons --save
+```
+
+-   Configuramos los estilos principales PrimeNg y el tema dentro del archivo `angular.json` en el apartado "styles":[]
+
+```
+"styles": [
+    "node_modules/primeicons/primeicons.css",
+    "node_modules/primeng/resources/themes/vela-blue/theme.css",
+    "node_modules/primeng/resources/primeng.min.css",
+    ...
+]
+```
+
+-   Dentro del `theme.css` se encuentran las variables de entorno configurada con los estilos própios del tema. Para utilizarlos, únicamente tenemos que aplicarselos a nuestros componentes. Así, en el momento de seleccionar otro tema cambiará estas variables y el aspecto visual de nuestra vista
+
+```css
+html,
+body {
+    margin: 10px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    background-color: var(--surface-d);
+    font-family: var(--font-family);
+}
+
+.text-layout {
+    color: var(--text-color);
+}
+```
+
+-   Para la utilización de los distintos componentes de **primeNg** tenemos que ir importandolos en el módulo correspondiente
+-   `import { ButtonModule } from 'primeng/button';`
+-   Para luego ir insertandolos en nuestro documento. Para esto tenemos dos formas:
+
+```html
+<button pButton type="button" label="Click"></button>
+<p-button label="Click"></p-button>
+```
+
+-   Una buena práctica para la utilización de los componentes de **PrimeNg** es centralizarlos en un mismo modulo y a continuación exportar este a los modulos donde nos sea preciso. Para eso crearemos un módulo llamado `prime-ng.module.ts` y dentro de este iremos importando y exportando todos los módulos de componentes a utilizar.
+-   Cuando se va a utilizar un componente que tenga algún tipo de animación, hay que importar un modulo en **app.module.ts** aparte para que pueda trabajar correctamente
+
+```typescript
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+```
+
+-   Otra configuración que existe es para que al pulsar botones tenga **efecto de ondas** - burbujas. Para esto hay que realizar lo siguiente en el componente **app.component.ts** de nuestra aplicación:
+
+```typescript
+import { PrimeNGConfig } from 'primeng/api';
+.
+.
+constructor(private primeNgConfig: PrimeNGConfig) {}
+  ngOnInit(): void {
+    this.primeNgConfig.ripple = true;
+```
+
+### PrimeFLex
+
+-   Para utilizar este módulo tenemos que realizar su instalación `npm install primeflex --save`
+-   Incluirlo en el apartado `styles: []` de nuestro **angular.json** `/node_modules/primeflex/primeflex.css`
+-   Para uso de PrimeFlex, revisar la [documentación](https://www.primefaces.org/primeflex/)
+
+### Pipes Básicos
+
+-   Información de la [documentación oficial](https://angular.io/guide/pipes-overview)
+    -   **UpperCase**: Trasnforma un texto a todo mayúsculas
+    -   **LowerCase**: Transforma un texto a todo minúsculas
+    -   **Titlecase**: Pone la primera letra de cada palabra en mayúsculas
+    -   **Date**: Maneja formateo de la fecha. Revisar la amplia [documentación](https://angular.io/api/common/DatePipe)
+
+![img](./assets/img/PipeDate.PNG)
+
+-   **Tip:** Para manejar fechas, sumarlas, etc... se recomienda utilizar la libreria [MomentJs](https://momentjs.com/)
+
+### Cambiar el Locale
+
+-   Con el siguiente código cambiamos de idioma todo lo relacionado con la configuración de fechas, números, monedas, etc..
+-   En el múdulo principal de nuestra aplicación `app.module.ts` incluimos lo siguiente:
+
+```typescript
+import localeEs from '@angular/common/locales/es'
+import localeFr from '@angular/common/locales/fr'
+import { registerLocaleData } from '@angular/common'
+registerLocaleData(localeEs)
+registerLocaleData(localeFr)
+```
+
+-   ...Y en el bloque de los `providers` esto otro:
+
+```typescript
+providers: [
+    { provide: LOCALE_ID, useValue: 'es' },
+    {
+      provide: DEFAULT_CURRENCY_CODE,
+      useValue: 'EUR',
+    },
+  ],
+```
+
+### Pipes Numericos
+
+-   **DecimalPipe** ( | number: '1.2-2'): Maneja la parte entera y decimal de un número.
+-   **CurrencyPipe** ( | currency: 'EUR':'symbol-narrow':'4.2-2') : Moneda
+-   **PercentPipe** ( | percent)
+
+### Pipes no Comunes
+
+-   **i18nSelectPipe**: Maneja el contenido de una palabra según el sexo
+
+```typescript
+@Component({
+    selector: 'i18n-select-pipe',
+    template: `<div>{{ gender | i18nSelect: inviteMap }}</div>`,
+})
+export class I18nSelectPipeComponent {
+    gender: string = 'male'
+    inviteMap: any = {
+        male: 'Invite him.',
+        female: 'Invite her.',
+        other: 'Invite them.',
+    }
+}
+```
+
+-   **i18nPluralPipe**: Maneja el contenido de una frase según las unidades
+
+```typescript
+@Component({
+    selector: 'i18n-plural-pipe',
+    template: `<div>{{ messages.length | i18nPlural: messageMapping }}</div>`,
+})
+export class I18nPluralPipeComponent {
+    messages: any[] = ['Message 1']
+    messageMapping: { [k: string]: string } = {
+        '=0': 'No messages.',
+        '=1': 'One message.',
+        other: '# messages.',
+    }
+}
+```
+
+-   **SlicePipe**: ( | slice): permite cortar un arreglo
+-   **KeyValuePipe**: ( | ): Permite mostrar objetos en formato **clave : valor** en la vista
+
+```html
+<ul>
+    <li *ngFor="let item of persona | keyvalue">
+        <b>{{ item.key | titlecase }}:</b> {{ item.value }}
+    </li>
+</ul>
+```
+
+-   **JsonPipe**: Permite mostrar objetos "en bruto" en la vista
+-   **AsyncPipe**: Se le aplicac a Observables o promesas
+
+### Pipes Personalizados
+
+-   Crear Pipe Personalizado `ng g pipe pipes/mayusculas`
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core'
+
+@Pipe({
+    name: 'mayusculas',
+})
+export class MayusculasPipe implements PipeTransform {
+    transform(valor: string, enMayusculas: boolean = true): string {
+        if (enMayusculas) {
+            return valor.toUpperCase()
+        } else {
+            return valor.toLowerCase()
+        }
+    }
+}
+```
+
+```html
+<p>Pipes creados por {{ "nosotros" | mayusculas: true }}</p>
+```
+
+-   **Tip:** Es posible encadenar Pipes `{{valor | primerPipe | segundoPipe}}`
+-   Pipe personalizado para realizar ordenación, en este caso de una tabla de datos
+
+```typescript
+@Pipe({
+    name: 'ordenar',
+})
+export class OrdenarPipe implements PipeTransform {
+    transform(heroes: Heroes[], ordenarPor: string = 'no ordenar'): Heroes[] {
+        if (ordenarPor === 'nombre') {
+            heroes = heroes.sort((a, b) => {
+                return a.nombre > b.nombre ? 1 : -1
+            })
+        }
+        if (ordenarPor === 'vuela') {
+            heroes = heroes.sort((a, b) => {
+                return a.vuela > b.vuela ? 1 : -1
+            })
+        }
+        if (ordenarPor === 'color') {
+            heroes = heroes.sort((a, b) => {
+                return a.color > b.color ? 1 : -1
+            })
+        }
+
+        return heroes
+    }
+}
+```
+
+-   **PrimeNg** nos proporciona directamente un componente que realizar ordenaciones de manera automática **SorteableTable**
+
+## 05_HeroesApp
+
+### Angular Material
+
+-   La parte de maquetación de esta aplicación se encuntra desarrollada utilizando la libreria [AngularMaterial](https://material.angular.io/)
+-   Instalación de AngularMaterial `ng add @angular/material`
+
+    -   Nos permitirá elegir un Tema personalizado
+    -   Aplicará una tipografia en modo global
+    -   Realizará la instalación de AnimationModule
+
+-   Igual que es hizo con el uso de los modules de **PrimeNg**, es buena práctica crearse un modulo **MaterialModule** para centralizar la importación de modules. Así cuando en un modulo externo queramos utilizar algún componente de **Material** sólo tendremos que importar al módulo en cuestión el modulo de Material
+
+### Estructura de nuestra aplicación
+
+-   En esta primera sección del curso se crea la estructura de la aplicación:
+    -   **auth**
+        -   pages
+            -   login
+            -   register
+    -   **heroes**
+        -   pages
+            -   home
+            -   agregar
+            -   buscar
+            -   heroe
+    -   **material**
+    -   **shared**
+        -   errorPage
+
+### Rutas - Rutas Hijas, LazyLoad
+
+-   Creamos un routing (auth-routing.module en este caso) en el módulo donde queremos manejar las rutas hijas.
+-   Creamos el sistema de rutas en este archivo
+
+    ```typescript
+    const routes: Routes = [
+      {
+          path:'',
+          children: [
+              {
+                  path: 'login',
+                  component: loginComponent
+              },
+              {
+                  path: 'register',
+                  component: registerComponent
+              },
+              {
+                  path: '**',
+                  redirectTo: 'login'
+              }
+          ]
+      }
+    ]
+
+    @NgModule({
+      imports: [
+          RouterModule.forChild(routes)
+      ],
+      exports: [
+        RouterModule
+      ]
+    })
+    ```
+
+-   Importante, **acordarse de exportar el RouterModule**
+-   Importamos este `auth-routing.module.ts` dentro de su modulo correspondinete `auth.module.ts`
+-   En nuestro sistema de rutas principal (`app-routing.module`) configuramos la carga lazyload al modulo anterior
+
+```typescript
+const routes: Routes = [
+    {
+        path: 'auth',
+        loadChildren: () =>
+            import('./auth/authModule').then((m) => m.AuthModule),
+    },
+    {
+        path: '404',
+        component: errorPageComponent,
+    },
+    {
+        path: '**',
+        redirectTo: '404',
+    },
+]
+```
+
+-   Se continua con la creación del sistema de rutas con la implementación de `heroes-routing.module`
+
+```typescript
+const routes: Routes = [
+    {
+        path: '',
+        component: HomeComponent,
+        children: [
+            {
+                path: 'listado',
+                component: ListadoComponent,
+            },
+            {
+                path: 'agregar',
+                component: AgregarComponent,
+            },
+            {
+                path: 'editar/:id',
+                component: AgregarComponent,
+            },
+            {
+                path: 'buscar',
+                component: BuscarComponent,
+            },
+            {
+                path: ':id',
+                component: HeroeComponent,
+            },
+            {
+                path: '**',
+                redirectTo: 'listado',
+            },
+        ],
+    },
+]
+
+@NgModule({
+    declarations: [],
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
+})
+export class HeroesRoutingModule {}
+```
+
+-   Observese la carga del componente **HomeComponent** en el momento que se carga la parte de heroes. Esta será nuestra página principal que gestione las rutas hijas.
+-   Este componente tendrá su propio estilo y en su vista se añadirá el `<router-outlet></router-outlet>` el cual será el encargado de ir renderizando los distintos componentes en las rutas hijas
