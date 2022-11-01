@@ -28,14 +28,28 @@
         -   [Pipes Numericos](#pipes-numericos)
         -   [Pipes no Comunes](#pipes-no-comunes)
         -   [Pipes Personalizados](#pipes-personalizados)
+        -   [Pipes Puros e impuros](#pipes-puros-e-impuros)
     -   [05_HeroesApp](#05_heroesapp)
         -   [Angular Material](#angular-material)
+        -   [Angular Flex-Layout (Deprecated)](#angular-flex-layout-deprecated)
         -   [Estructura de nuestra aplicación](#estructura-de-nuestra-aplicación)
         -   [Rutas - Rutas Hijas, LazyLoad](#rutas---rutas-hijas-lazyload)
+        -   [Componentes de Angular Material](#componentes-de-angular-material)
+            -   [Sidenav](#sidenav)
+        -   [JSON Server](#json-server)
+        -   [Continuación del Proyecto](#continuación-del-proyecto)
+        -   [Pipe para manejar Imagenes](#pipe-para-manejar-imagenes)
+        -   [Creación de un Spinner para el loader](#creación-de-un-spinner-para-el-loader)
+        -   [Router.navigate Router.navigateByUrl](#routernavigate-routernavigatebyurl)
+        -   [Manejo de los Enviroments](#manejo-de-los-enviroments)
+        -   [Angular Material Autocomplete](#angular-material-autocomplete)
+        -   [Creación del CRUD completo para leer, crear, editar y borrar](#creación-del-crud-completo-para-leer-crear-editar-y-borrar)
+        -   [SnackBar](#snackbar)
+        -   [Dialog](#dialog)
 
 # Apuntes-Curso-Angular
 
--   Apuntes extraidos del curso de angular de Fernando Herrera organizados en relización a las secciones del curso y las aplicaciones desarroyadas en el mismo
+-   Apuntes extraidos del curso de angular de Fernando Herrera organizados en relización a las secciones del curso y las aplicaciones desarroyadas en él mismo
 
 ---
 
@@ -68,7 +82,7 @@
 </ul>
 ```
 
--   Directiva estructural **NgIf** **<ng-template>**
+-   Directiva estructural **NgIf** **ng-template**
 
 ```html
 <div class="d-block" *ngIf="heroeBorrado; else noBorrado">
@@ -780,6 +794,21 @@ export class OrdenarPipe implements PipeTransform {
 
 -   **PrimeNg** nos proporciona directamente un componente que realizar ordenaciones de manera automática **SorteableTable**
 
+### Pipes Puros e impuros
+
+-   Que un pipe sea puro o impuro define el comportamiento de este (cuando se disparará) ante la detección de cambios del ciclo de vida de Angular.
+-   Un pipe Puro se disparará únicamente cunado el pipe detecte un cambio "sustancial" en el objeto o valor primitivo al que se le aplica. Cambio de objeto por referencia, por ejemplo
+-   Un pipe inpuro se disparará incluso cuando un mismo objeto cambie alguno de sus atributos.
+-   Por defecto los pipes se crean de modo Puro
+-   Cómo se define si un pipe es puro o impuro se realiza en la misma creación del pipe
+
+```typescript
+@Pipe({
+  name: 'imagenPipe',
+  pure: false,
+})
+```
+
 ## 05_HeroesApp
 
 ### Angular Material
@@ -792,6 +821,11 @@ export class OrdenarPipe implements PipeTransform {
     -   Realizará la instalación de AnimationModule
 
 -   Igual que es hizo con el uso de los modules de **PrimeNg**, es buena práctica crearse un modulo **MaterialModule** para centralizar la importación de modules. Así cuando en un modulo externo queramos utilizar algún componente de **Material** sólo tendremos que importar al módulo en cuestión el modulo de Material
+
+### Angular Flex-Layout (Deprecated)
+
+-   Para esta aplicación se hará uso del sistema de manejo de layouts [Angular Flex-Layout](https://www.npmjs.com/package/@angular/flex-layout)
+-   **Angular acaba de anunciar que descontinua el desarroyo de Angular Flex-Layout en favor de CSS Flex y CSS grid**
 
 ### Estructura de nuestra aplicación
 
@@ -914,3 +948,332 @@ export class HeroesRoutingModule {}
 
 -   Observese la carga del componente **HomeComponent** en el momento que se carga la parte de heroes. Esta será nuestra página principal que gestione las rutas hijas.
 -   Este componente tendrá su propio estilo y en su vista se añadirá el `<router-outlet></router-outlet>` el cual será el encargado de ir renderizando los distintos componentes en las rutas hijas
+
+### Componentes de Angular Material
+
+#### Sidenav
+
+-   `import {MatSidenavModule} from '@angular/material/sidenav'`
+-   Codigo de ejemplo de una pantalla completa con sideNav. En esta también se hace uso de varios componentes más de Material
+-   `import {MatToolbarModule} from '@angular/material/toolbar`
+-   `import {MatButtonModule} from '@angular/material/button`
+-   `import {MatIconModule} from '@angular/material/icon`
+    -   Listado de [Iconos](https://fonts.google.com/icons?selected=Material+Icons:bookmark) disponibles de Material
+-   `import {MatListModule} from '@angular/material/list`
+
+```html
+<mat-sidenav-container fullscreen>
+    <mat-sidenav #sidenav mode="push">
+        <mat-toolbar color="accent">
+            <span>Menú</span>
+            <span class="spacer"></span>
+            <button mat-icon-button (click)="sidenav.toggle()">
+                <mat-icon mat-list-icon>close</mat-icon>
+            </button>
+        </mat-toolbar>
+        <mat-nav-list>
+            <a routerLink="./listado" (click)="sidenav.toggle()" mat-list-item>
+                <mat-icon mat-list-icon>label</mat-icon>
+                <span>Listado de Heroes</span>
+            </a>
+            <a routerLink="./agregar" (click)="sidenav.toggle()" mat-list-item>
+                <mat-icon mat-list-icon>add</mat-icon>
+                <span>Agregar Heroes</span>
+            </a>
+            <a routerLink="./buscar" (click)="sidenav.toggle()" mat-list-item>
+                <mat-icon mat-list-icon>search</mat-icon>
+                <span>Buscar Heroes</span>
+            </a>
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-toolbar color="primary">
+        <button mat-icon-button (click)="sidenav.toggle()">
+            <mat-icon>list</mat-icon>
+        </button>
+        <span class="spacer"></span>
+        <span>{{ auth.usuario }}</span>
+        <button
+            class="logOut"
+            mat-raised-button
+            (click)="logOut()"
+            color="warn"
+        >
+            LogOut
+        </button>
+    </mat-toolbar>
+
+    <div class="container">
+        <router-outlet></router-outlet>
+    </div>
+</mat-sidenav-container>
+```
+
+-   En el componente `<mat-toolbar>` se encuetra una clase personalizada `.spacer`. Esto es una clase **CSS** que nos permite separar dos elementos en la barra de menú superior colocando uno en cada extremo
+
+```css
+.spacer {
+    flex: 1 1 auto;
+}
+```
+
+### JSON Server
+
+-   En este tema se utiliza una base de datos **fake** la cual nos permite un rápido prototipado y pruebas de nuestro FrontEnd contra una api.
+-   Para esto hacemos uso de [JSON Server](https://www.npmjs.com/package/json-server)
+-   `npm install -g json-server`
+-   Necesitaremos un archivo `db.json` el cual contendrá un objeto json con toda la información que simularia nuestro **REST API**
+-   Una vez que tengamos este archivo en una carpeta en local, accederemos a este directorio mediante la terminal Windows, gitBash etc... y ejecutaremos `json-server --watch db.json`
+
+### Continuación del Proyecto
+
+-   Se continua en el desarroyo de la aplicación creando el servicio que manejará la comunicación entre la aplicación y el fake API
+-   Componente **Card** `import {MatCardModule} from '@angular/material/card';`
+-   Se estructuran las cards mediante fxLayout (Deprecated) Se recomienda ya el uso de CSS flex y Grid
+-   Creación del componente **HeroeCardComponent**
+
+### Pipe para manejar Imagenes
+
+-   Se crea un **Pipe** para que controle la lógica de la devolución de la ruta de la imagen según varias casuísticas: img url, img id, no-img
+
+```typescript
+@Pipe({
+    name: 'imagenPipe',
+})
+export class ImagenPipe implements PipeTransform {
+    transform(heroe: Heroe): string {
+        if (heroe.altImg) {
+            return heroe.altImg
+        }
+        if (heroe.id) {
+            return `assets/heroes/${heroe.id}.jpg`
+        }
+        return `assets/no-image.png`
+    }
+}
+```
+
+### Creación de un Spinner para el loader
+
+-   `import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';`
+
+```html
+<div *ngIf="!heroe; else divHeroe">
+    <mat-spinner></mat-spinner>
+</div>
+<ngTemplate #divHeroe>...Contenido tarjeta Heroe...</ngTemplate>
+```
+
+### Router.navigate Router.navigateByUrl
+
+-   Ademas de `RouterLink` para realizar una navegación desde la vista de nuestra aplicación, también disponemos de dos metodos de la clase `Router` para realizar la navegación desde el propio controlador typescript
+-   Para ello deberemos **importar** la clase **Router** e **inyectarla** en nuestro constructor
+    -   `router.navigate(['segmentoRuta-1','segmentoRuta-2'])`
+    -   `router.navigateByURl('stringRuta')`
+
+### Manejo de los Enviroments
+
+-   exsisten dos tipos de variables de entorno. Producción y Desarroyo
+-   Es conveniente manejar variables de entorno para información que deba ser accesible desde toda nuestra aplicación.
+-   En estas variables de entorno se suele colocar fragmentos de la ruta base de nuestras peticiones http, api_key de distintas apis, etc...
+
+-   Desarroyo
+
+```typescript
+export const environment = {
+    production: false,
+    baseUrl: 'http://localhost:3000',
+}
+```
+
+-   Producción
+
+```typescript
+export const environment = {
+    production: true,
+    baseUrl: 'http://santos_martinez.com/api',
+}
+```
+
+-   Luego donde tengamos que utilizar nuestra propiedad BaseUrl tendremos que asignarla del siguiente modo: `const baseUrl = enviroments.baseUrl`
+
+### Angular Material Autocomplete
+
+-   `import {MatAutocompleteModule} from '@angular/material/autocomplete';`
+-   `import {MatFormFieldModule} from '@angular/material/form-field';`
+-   `import {MatInputModule} from '@angular/material/input';`
+-   Para este ejemplo en concreto se utiliza el FormsModule `[(ngModel)]` para leer el contenido del input
+-   Ejemplo Vista y controlador **Input y Autocomplete**
+
+```html
+<div>
+    <div><h1>Buscador de Héroes</h1></div>
+    <mat-divider></mat-divider>
+    <div>
+        <h3>Buscador</h3>
+        <form fxLayout="column">
+            <mat-form-field appearance="fill">
+                <mat-label>Heroe</mat-label>
+                <input
+                    type="text"
+                    matInput
+                    [(ngModel)]="termino"
+                    name="termino"
+                    (input)="buscando()"
+                    [matAutocomplete]="auto"
+                />
+                <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                    (optionSelected)="opcionSeleccionada($event)"
+                >
+                    <div *ngIf="!errorBusqueda; else noEncontrado">
+                        <mat-option
+                            *ngFor="let heroe of heroes"
+                            [value]="heroe"
+                        >
+                            {{ heroe.superhero }}
+                        </mat-option>
+                    </div>
+                    <ng-template #noEncontrado>
+                        <mat-option [value]="">
+                            No se ha encontrado {{ termino }}
+                        </mat-option>
+                    </ng-template>
+                </mat-autocomplete>
+            </mat-form-field>
+        </form>
+    </div>
+    <div *ngIf="heroeSeleccionado" fxLayout="row">
+        <img
+            [src]="heroeSeleccionado | imagenPipe"
+            [routerLink]="['/heroes', heroeSeleccionado.id]"
+        />
+    </div>
+</div>
+```
+
+```typescript
+export class BuscarComponent implements OnInit {
+    termino: string = ''
+    heroes: Heroe[] = []
+    heroeSeleccionado!: Heroe
+    errorBusqueda: boolean = false
+
+    constructor(private heroeService: HeroesService) {}
+
+    ngOnInit(): void {}
+
+    buscando() {
+        this.heroeService.getSugerencias(this.termino).subscribe((heroes) => {
+            if (heroes.length === 0) {
+                this.errorBusqueda = true
+                this.heroes = []
+            } else {
+                this.heroes = heroes
+                this.errorBusqueda = false
+            }
+        })
+    }
+    opcionSeleccionada(event: MatAutocompleteSelectedEvent) {
+        if (!event.option.value) {
+            this.termino = ''
+            return
+        } else {
+            const heroe: Heroe = event.option.value
+            this.termino = heroe.superhero
+            this.heroeService.getHeroePorId(heroe.id!).subscribe((heroe) => {
+                this.heroeSeleccionado = heroe
+            })
+        }
+    }
+}
+```
+
+### Creación del CRUD completo para leer, crear, editar y borrar
+
+```typescript
+export class HeroesService {
+    private baseUrl: string = environment.baseUrl
+
+    constructor(private http: HttpClient) {}
+    getHeroes(): Observable<Heroe[]> {
+        return this.http.get<Heroe[]>(`${this.baseUrl}/heroes`)
+    }
+    getHeroePorId(id: string): Observable<Heroe> {
+        return this.http.get<Heroe>(`${this.baseUrl}/heroes/${id}`)
+    }
+    getSugerencias(termino: string): Observable<Heroe[]> {
+        return this.http.get<Heroe[]>(
+            `${this.baseUrl}/heroes/?q=${termino}&_limit=6`
+        )
+    }
+    agregarHeroe(heroe: Heroe): Observable<Heroe> {
+        return this.http.post<Heroe>(`${this.baseUrl}/heroes`, heroe)
+    }
+    actualizarHeroe(heroe: Heroe): Observable<Heroe> {
+        return this.http.put<Heroe>(`${this.baseUrl}/heroes/${heroe.id}`, heroe)
+    }
+    borrarHeroe(heroe: Heroe): Observable<any> {
+        return this.http.delete<Heroe>(`${this.baseUrl}/heroes/${heroe.id}`)
+    }
+}
+```
+
+### SnackBar
+
+-   `import {MatSnackBarModule} from '@angular/material/snack-bar';`
+
+-   **SnackBar** muestra pequeños mensajes emergentes de confirmación ante una acción
+
+### Dialog
+
+-   `import {MatDialogModule} from '@angular/material/dialog';`
+-   **Dialog** muestra una ventana para solicitar algún tipo de confirmación o mensaje
+-   Más información sobre **Dialog** en la documentación oficial [Material Dialog](https://material.angular.io/components/dialog/overview)
+-   Su implementación es algo compleja, pero se puede encontrar más información en el capitulo correspondiente del curso de Angular F.Herrera
+-   **Creación y disparo de la ventana emergente**
+
+```typescript
+ borrar() {
+    const dialogObjeto = this.dialog.open(ConfirmarComponent, {
+      width: '300px',
+      data: { ...this.heroe },
+    });
+
+    dialogObjeto
+      .afterClosed()
+      .pipe(
+        switchMap((resultado) => {
+          return resultado
+            ? this.heroeService.borrarHeroe(this.heroe)
+            : timer(0);
+        })
+      )
+      .subscribe(() => this.router.navigate(['/heroes/listado']));
+  }
+```
+
+-   **Componente Ventana emergente recibiendo y devolviento datos**
+
+```typescript
+export class ConfirmarComponent implements OnInit {
+    heroe!: Heroe
+
+    constructor(
+        private dialogRef: MatDialogRef<ConfirmarComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: Heroe
+    ) {}
+
+    ngOnInit(): void {
+        this.heroe = this.data
+    }
+
+    borrar() {
+        this.dialogRef.close(true)
+    }
+
+    cancelar() {
+        this.dialogRef.close()
+    }
+}
+```
